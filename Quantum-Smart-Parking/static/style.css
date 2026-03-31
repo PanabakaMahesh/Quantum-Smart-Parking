@@ -1,0 +1,10 @@
+body { background: #57a3cc; color: white; font-family: 'Arial', sans-serif; }
+.parking-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.slot {
+    width: 80px; height: 120px; border-radius: 10px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    transition: 0.3s;
+}
+.slot.free { border: 2px solid #2ecc71; background: rgba(37, 149, 84, 0.1); box-shadow: 0 0 10px #2ecc71; }
+.slot.occupied { border: 2px solid #e74c3c; background: rgba(231, 76, 60, 0.1); box-shadow: 0 0 15px #e74c3c; }
+.car { background: #3498db; color: white; padding: 4px 8px; border-radius: 5px; font-weight: bold; margin-bottom: 10px; }

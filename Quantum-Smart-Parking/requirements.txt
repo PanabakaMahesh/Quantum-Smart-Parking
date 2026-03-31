@@ -1,0 +1,14 @@
+# Data Handling and Logic
+pandas
+numpy
+
+# Quantum Computing Framework
+qiskit
+qiskit-optimization
+qiskit-algorithms
+
+# Visualization and GUI
+matplotlib
+
+# Web and Threading (Internal to Python but listed for completeness)
+flask

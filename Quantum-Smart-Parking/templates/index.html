@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quantum vs Classical Performance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .split-view { display: flex; justify-content: space-around; margin-top: 20px; }
+        .divider { width: 2px; background: #444; height: 350px; margin-top: 40px; }
+        .report-card { width: 90%; margin: 40px auto; padding: 25px; background: #1e1e1e; border-radius: 15px; border: 1px solid #333; }
+        .comparison-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: white; font-size: 1.1rem; }
+        .comparison-table th, .comparison-table td { padding: 15px; border-bottom: 1px solid #333; text-align: center; }
+        .comparison-table th { background: #252525; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px; }
+        #verdict { text-align: center; margin-top: 25px; font-weight: bold; font-size: 1.2rem; padding: 10px; border-radius: 5px; }
+        .highlight { color: #3498db; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Quantum vs Classical Performance Report</h1>
+
+    <div class="split-view">
+        <div style="width: 45%;">
+            <h2>⚛️ Quantum (Global Opt)</h2>
+            <div id="quantum-lot" class="parking-grid"></div>
+        </div>
+        <div class="divider"></div>
+        <div style="width: 45%;">
+            <h2>💻 Classical (Greedy)</h2>
+            <div id="classical-lot" class="parking-grid"></div>
+        </div>
+    </div>
+
+    <div class="report-card">
+        <h2 style="color: #3498db; text-align: center;">📊 Real-Time Execution Report</h2>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Performance Metric</th>
+                    <th>Quantum Solver (Exact)</th>
+                    <th>Classical Greedy Solver</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Total Distance (Efficiency)</strong></td>
+                    <td><span class="highlight" id="q-dist">0</span>m</td>
+                    <td><span class="highlight" id="c-dist">0</span>m</td>
+                </tr>
+                <tr>
+                    <td><strong>Solver Latency (Speed)</strong></td>
+                    <td><span id="q-speed">0</span> ms</td>
+                    <td><span id="c-speed">0</span> ms</td>
+                </tr>
+                <tr>
+                    <td><strong>Decision Variables</strong></td>
+                    <td><span id="qubit-count">0</span> Qubits</td>
+                    <td>O(N) Complexity</td>
+                </tr>
+                <tr>
+                    <td><strong>Optimization Mode</strong></td>
+                    <td>Simultaneous (Global)</td>
+                    <td>Sequential (Step-by-Step)</td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="verdict">Comparing solvers...</div>
+    </div>
+
+    <script>
+        function updateLot(id, slots, allocs) {
+            const grid = document.getElementById(id);
+            grid.innerHTML = '';
+            slots.forEach(slot => {
+                const div = document.createElement('div');
+                let vId = Object.keys(allocs).find(key => allocs[key] === slot.slot_id);
+                div.className = 'slot ' + (vId ? 'occupied' : 'free');
+                div.innerHTML = vId ? `<div class="car">${vId}</div>` : '';
+                div.innerHTML += `<span>${slot.slot_id}</span><br><small>${slot.distance}m</small>`;
+                grid.appendChild(div);
+            });
+        }
+
+        async function refresh() {
+            try {
+                const res = await fetch('/get_data');
+                const data = await res.json();
+                
+                updateLot('quantum-lot', data.slots, data.quantum);
+                updateLot('classical-lot', data.slots, data.classical);
+                
+                document.getElementById('q-dist').innerText = data.q_total;
+                document.getElementById('c-dist').innerText = data.c_total;
+                document.getElementById('q-speed').innerText = data.q_speed;
+                document.getElementById('c-speed').innerText = data.c_speed;
+                document.getElementById('qubit-count').innerText = data.qubits;
+
+                const diff = data.c_total - data.q_total;
+                const v = document.getElementById('verdict');
+                if (diff > 0) {
+                    v.innerHTML = `⭐ <strong>QUANTUM ADVANTAGE:</strong> Quantum found a Global Minimum ${diff}m more efficient than Greedy!`;
+                    v.style.color = "#2ecc71";
+                    v.style.background = "rgba(46, 204, 113, 0.1)";
+                } else {
+                    v.innerHTML = "SYSTEM STATUS: Both solvers currently optimized to Global Minimum.";
+                    v.style.color = "#f1c40f";
+                    v.style.background = "rgba(241, 196, 15, 0.1)";
+                }
+            } catch(e) { console.error("Fetch Error:", e); }
+        }
+
+        setInterval(refresh, 2000);
+        refresh();
+    </script>
+</body>
+</html>
